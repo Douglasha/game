@@ -11,13 +11,18 @@
 body {
   background-color: #f5f5fa;
 
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'Noto Sans', serif;
   font-optical-sizing: auto;
   /* color: #E1E1E6;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh; */
+}
+
+input {
+  font-family: 'Noto Sans', serif;
+  font-optical-sizing: auto;
 }
 
 button {
