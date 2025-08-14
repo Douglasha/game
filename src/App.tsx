@@ -33,6 +33,10 @@ export default function App() {
     startGame()
   }, [])
 
+  if (!challenge) {
+    return
+  }
+
   return (
     <div className={styles.container}>
       <main>
@@ -41,11 +45,13 @@ export default function App() {
         <Tip tip="Uma das linguagens de programação mais utilizadas" />
 
         <div className={styles.word}>
-          <Letter value="R" />
-          <Letter value="e" />
-          <Letter value="a" />
-          <Letter value="c" />
-          <Letter value="t" />
+          {
+            challenge.word.split("").map(() => (
+              <Letter value="" />
+            ))
+          }
+          
+         
         </div>
 
         <h4>Palpite</h4>
