@@ -50,7 +50,8 @@ export default function App() {
     const exists = lettersUsed.find((used) => used.value.toUpperCase() === value)
 
     if (exists) {
-      return alert("Você já usou essa letra")
+      setLetter("")
+      return alert("Você já usou essa letra" + value)
     }
 
     const hits = challenge.word
@@ -59,16 +60,39 @@ export default function App() {
       .filter((char) => char === value).length
 
     const correct = hits > 0
-    const currentScore =score + hits
+    const currentScore = score + hits
 
     setLettersUsed((prevState) => [...prevState, {value, correct }])
     setScore(currentScore)
     setLetter("")
   }
 
+  function endGame(message: string) {
+    alert(message)
+    startGame()
+  }
+
   useEffect(() => {
     startGame()
   }, [])
+
+  useEffect(() => {
+    if(!challenge){
+      return
+    }
+
+    setTimeout(() => {
+      if(score === challenge.word.length){
+        return endGame("Parabéns, você acertou a palavra!")
+      }
+
+      const attemptLimit = challenge.word.length + ATTEMPTS_MARGIN
+
+      if(lettersUsed.length === attemptLimit){
+        return endGame(`Você não acertou a palavra, ela era: ${challenge.word}`)
+      }
+    }, 300)
+  }, [score, lettersUsed.length])
 
   if (!challenge) {
     return
