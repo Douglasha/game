@@ -24,7 +24,11 @@ export default function App() {
 
 
   function handleRestartGame() {
-    alert("Reiniciar o jogo")
+    const isConfirmed = window.confirm("Você tem certeza que deseja reiniciar o jogo?")
+
+    if (isConfirmed) {
+      startGame()
+    }
   }
 
   function startGame() {
@@ -110,9 +114,10 @@ export default function App() {
         <Tip tip={challenge.tip} />
 
         <div className={styles.word}>
-          {
-            challenge.word.split("").map((letter, index) => {
-              const letterUsed = lettersUsed.find((used) => used.value.toUpperCase() === letter.toUpperCase())
+          {challenge.word.split("").map((letter, index) => {
+              const letterUsed = lettersUsed.find(
+                (used) => used.value.toUpperCase() === letter.toUpperCase()
+              )
               
               return <Letter key={index} value={letterUsed?.value} color={letterUsed?.correct ? "correct" : "default"}/>
             })}
