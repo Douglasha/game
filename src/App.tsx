@@ -17,8 +17,8 @@ const ATTEMPTS_MARGIN = 5
 
 
 export default function App() {
-  const [score, setScore] = useState(0)
   const [letter, setLetter] = useState("")
+  const [attempts, setAttempts] = useState(0)
   const [lettersUsed, setLettersUsed] = useState<LettersUsedProps[]>([])
   const [challenge, setChallenge] = useState<Challenge | null>(null)
 
@@ -36,7 +36,7 @@ export default function App() {
     const randomWord = WORDS[index]
 
     setChallenge(randomWord)
-    setScore(0)
+    setAttempts(0)
     setLetter("")
     setLettersUsed([])
   }
@@ -50,7 +50,7 @@ export default function App() {
       return alert("Digite uma letra")
     }
 
-    const value = letter.toLowerCase().trim()
+    const value = letter.toUpperCase()
     const exists = lettersUsed.find((used) => used.value.toUpperCase() === value)
 
     if (exists) {
@@ -64,10 +64,10 @@ export default function App() {
       .filter((char) => char === value).length
 
     const correct = hits > 0
-    const currentScore = score + hits
+    const currentScore = attempts + hits
 
     setLettersUsed((prevState) => [...prevState, {value, correct }])
-    setScore(currentScore)
+    setAttempts(currentScore)
     setLetter("")
   }
 
@@ -86,7 +86,7 @@ export default function App() {
     }
 
     setTimeout(() => {
-      if(score === challenge.word.length){
+      if(attempts === challenge.word.length){
         return endGame("Parabéns, você acertou a palavra!")
       }
 
@@ -96,7 +96,7 @@ export default function App() {
         return endGame(`Você não acertou a palavra, ela era: ${challenge.word}`)
       }
     }, 300)
-  }, [score, lettersUsed.length])
+  }, [attempts, lettersUsed.length])
 
   if (!challenge) {
     return
@@ -127,7 +127,13 @@ export default function App() {
 
         <h4>Palpite</h4>
         <div className={styles.guess}>
-          <Input autoFocus maxLength={1} placeholder="?" value={letter} onChange={(e) => setLetter(e.target.value)}/>
+          <Input 
+            autoFocus 
+            maxLength={1} 
+            placeholder="?" 
+            value={letter} 
+            onChange={(e) => setLetter(e.target.value)}
+          />
           <Button title="Confirmar" onClick={handleConfirm}/>
         </div>
 
