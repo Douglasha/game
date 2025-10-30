@@ -1,144 +1,160 @@
-import styles from "./App.module.css"
-import { useEffect, useState } from "react"
+import styles from "./App.module.css";
+import { useEffect, useState } from "react";
 
-import { WORDS} from "./utils/words"
-import type { Challenge } from "./utils/words"
+import { WORDS } from "./utils/words";
+import type { Challenge } from "./utils/words";
 
+import { Input } from "./components/Input";
+import { Button } from "./components/Button";
+import { Tip } from "./components/Tip";
+import { Letter } from "./components/Letter";
+import { Header } from "./components/Header";
+import type { LettersUsedProps } from "./components/LettersUsed";
+import { LettersUsed } from "./components/LettersUsed";
 
-import { Input } from "./components/Input"
-import { Button } from "./components/Button"
-import { Tip } from "./components/Tip"
-import { Letter } from "./components/Letter"
-import { Header } from "./components/Header"
-import type { LettersUsedProps } from "./components/LettersUsed"
-import { LettersUsed } from "./components/LettersUsed"
-
-const ATTEMPTS_MARGIN = 5
-
+const ATTEMPTS_MARGIN = 5;
 
 export default function App() {
-  const [letter, setLetter] = useState("")
-  const [attempts, setAttempts] = useState(0)
-  const [lettersUsed, setLettersUsed] = useState<LettersUsedProps[]>([])
-  const [challenge, setChallenge] = useState<Challenge | null>(null)
-
+  const [letter, setLetter] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [lettersUsed, setLettersUsed] = useState<LettersUsedProps[]>([]);
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [shake, setShake] = useState(false);
 
   function handleRestartGame() {
-    const isConfirmed = window.confirm("Você tem certeza que deseja reiniciar o jogo?")
+    const isConfirmed = window.confirm(
+      "Você tem certeza que deseja reiniciar o jogo?"
+    );
 
     if (isConfirmed) {
-      startGame()
+      startGame();
     }
   }
 
   function startGame() {
-    const index = Math.floor(Math.random() * WORDS.length)
-    const randomWord = WORDS[index]
+    const index = Math.floor(Math.random() * WORDS.length);
+    const randomWord = WORDS[index];
 
-    setChallenge(randomWord)
-    setAttempts(0)
-    setLetter("")
-    setLettersUsed([])
+    setChallenge(randomWord);
+    setAttempts(0);
+    setLetter("");
+    setLettersUsed([]);
   }
 
-  function handleConfirm(){
+  function handleConfirm() {
     if (!challenge) {
-      return
+      return;
     }
 
     if (!letter.trim()) {
-      return alert("Digite uma letra")
+      return alert("Digite uma letra");
     }
 
-    const value = letter.toUpperCase()
-    const exists = lettersUsed.find((used) => used.value.toUpperCase() === value)
+    const value = letter.toUpperCase();
+    const exists = lettersUsed.find(
+      (used) => used.value.toUpperCase() === value
+    );
 
     if (exists) {
-      setLetter("")
-      return alert("Você já usou essa letra" + value)
+      setLetter("");
+      return alert("Você já usou essa letra" + value);
     }
 
     const hits = challenge.word
       .toUpperCase()
       .split("")
-      .filter((char) => char === value).length
+      .filter((char) => char === value).length;
 
-    const correct = hits > 0
-    const currentScore = attempts + hits
+    const correct = hits > 0;
+    const currentScore = attempts + hits;
 
-    setLettersUsed((prevState) => [...prevState, {value, correct }])
-    setAttempts(currentScore)
-    setLetter("")
+    setLettersUsed((prevState) => [...prevState, { value, correct }]);
+    setAttempts(currentScore);
+    setLetter("");
+
+    if (!correct) {
+      setShake(true);
+
+      setTimeout(() => {
+        setShake(false);
+      }, 500);
+    }
   }
 
   function endGame(message: string) {
-    alert(message)
-    startGame()
+    alert(message);
+    startGame();
   }
 
   useEffect(() => {
-    startGame()
-  }, [])
+    startGame();
+  }, []);
 
   useEffect(() => {
-    if(!challenge){
-      return
+    if (!challenge) {
+      return;
     }
 
     setTimeout(() => {
-      if(attempts === challenge.word.length){
-        return endGame("Parabéns, você acertou a palavra!")
+      if (attempts === challenge.word.length) {
+        return endGame("Parabéns, você acertou a palavra!");
       }
 
-      const attemptLimit = challenge.word.length + ATTEMPTS_MARGIN
+      const attemptLimit = challenge.word.length + ATTEMPTS_MARGIN;
 
-      if(lettersUsed.length === attemptLimit){
-        return endGame(`Você não acertou a palavra, ela era: ${challenge.word}`)
+      if (lettersUsed.length === attemptLimit) {
+        return endGame(
+          `Você não acertou a palavra, ela era: ${challenge.word}`
+        );
       }
-    }, 300)
-  }, [attempts, lettersUsed.length])
+    }, 300);
+  }, [attempts, lettersUsed.length]);
 
   if (!challenge) {
-    return
+    return;
   }
 
   return (
     <div className={styles.container}>
       <main>
-        <Header 
-          current={lettersUsed.length} 
-          max={challenge.word.length + ATTEMPTS_MARGIN} 
-          onRestart={handleRestartGame} 
+        <Header
+          current={lettersUsed.length}
+          max={challenge.word.length + ATTEMPTS_MARGIN}
+          onRestart={handleRestartGame}
         />
-        
+
         <Tip tip={challenge.tip} />
 
-        <div className={styles.word}>
+        <div className={`${styles.word} ${shake && styles.shake}`}>
           {challenge.word.split("").map((letter, index) => {
-              const letterUsed = lettersUsed.find(
-                (used) => used.value.toUpperCase() === letter.toUpperCase()
-              )
-              
-              return <Letter key={index} value={letterUsed?.value} color={letterUsed?.correct ? "correct" : "default"}/>
-            })}
-          
-         
+            const letterUsed = lettersUsed.find(
+              (used) => used.value.toUpperCase() === letter.toUpperCase()
+            );
+
+            return (
+              <Letter
+                key={index}
+                value={letterUsed?.value}
+                color={letterUsed?.correct ? "correct" : "default"}
+              />
+            );
+          })}
         </div>
 
         <h4>Palpite</h4>
         <div className={styles.guess}>
-          <Input 
-            autoFocus 
-            maxLength={1} 
-            placeholder="?" 
-            value={letter} 
+          <Input
+            autoFocus
+            maxLength={1}
+            placeholder="?"
+            value={letter}
             onChange={(e) => setLetter(e.target.value)}
           />
-          <Button title="Confirmar" onClick={handleConfirm}/>
+          <Button title="Confirmar" onClick={handleConfirm} />
         </div>
 
-        <LettersUsed data={lettersUsed}/>
+        <LettersUsed data={lettersUsed} />
       </main>
     </div>
-  )
+  );
 }
